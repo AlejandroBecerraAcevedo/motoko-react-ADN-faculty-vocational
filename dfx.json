@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "ADN-faculty-vocational-backend": {
+      "main": "src/ADN-faculty-vocational-backend/main.mo",
+      "type": "motoko"
+    },
+    "ADN-faculty-vocational-frontend": {
+      "dependencies": [
+        "ADN-faculty-vocational-backend"
+      ],
+      "source": [
+        "src/ADN-faculty-vocational-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "ADN-faculty-vocational-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
