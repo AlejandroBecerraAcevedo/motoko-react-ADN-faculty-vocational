@@ -19,29 +19,20 @@ actor {
   var profilesProf: Map.HashMap<Principal, ProfileProf.ProfileProf> = Map.HashMap<Principal, ProfileProf.ProfileProf>(0,Principal.equal, Principal.hash);
   var surveys: Map.HashMap<Text, Survey.Survey> = Map.HashMap<Text, Survey.Survey>(0, Text.equal, Text.hash);
   var profiles: Map.HashMap<Text, ProfileSchema.Profile> = Map.HashMap<Text, ProfileSchema.Profile>(0, Text.equal, Text.hash);
-  //let newProfile = ProfileSchema.createProfile("username", ?"bio", 20, ?"email");
-  //profiles.put("A", newProfile);
-
-      // Guarda Perfil del usuario en una variable
-    let newProfile = ProfileSchema.createProfile("username", ?"bio", 20, ?"email");
-    profiles.put("B", newProfile); 
-
-
-     
-
-  public query func createProfilePersonal(username: Text, bio: ?Text, age: Nat, email: ?Text): async Nat {
+  
+  public func createProfilePersonal(username: Text, bio: ?Text, age: Nat, email: ?Text): async Nat {
     
 
     // Guarda Perfil del usuario en una variable
-    let newProfile = ProfileSchema.createProfile("username", ?"bio", 20, ?"email");
-    profiles.put("A", newProfile);   
+    let newProfile = ProfileSchema.createProfile(username: Text, bio: ?Text, age: Nat, email: ?Text);
+    profiles.put(username, newProfile);   
 
     return profiles.size(); // Retornar el ID de la nuevas Respuestas
   };
 
-  public query func getProfile(): async Nat {     
+  public func getProfile(username: Text): async ?ProfileSchema.Profile {     
     //let profile: ?ProfileSchema.Profile = profiles.get("A");
-    return  profiles.size(); // Retornar el Perfil
+    return  profiles.get(username); // Retornar el Perfil
   };
 
 
