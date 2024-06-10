@@ -1,3 +1,4 @@
+import Text "mo:base/Text";
 module {
 
 
@@ -10,13 +11,13 @@ module {
     // Define the type Question
     public type Question = {
         id : Nat;        
-        response : Char;
+        response : Text;
     };
 
 
     // Función para crear una nueva encuesta
-    public func createEncuesta(questions : [Question]) : Survey = {
-        questions = questions;
+    public func createEncuesta(questions : [Question]) : Survey {
+        return {questions = questions;};        
     };
 
 };

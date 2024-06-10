@@ -7,9 +7,11 @@ module {
   };
 
   // Función para crear un nuevo perfil
-  public func createProfile(name : Text, puntaje : Float) : ProfileProf = {
-    name = name;
-    puntaje = puntaje;
-  };
+  public func createProfileProf(name: Text, puntaje: Float): ProfileProf {
+    return {
+      name = name;
+      puntaje = puntaje;
+    };
+  }
 
 };
