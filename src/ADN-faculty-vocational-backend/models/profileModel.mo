@@ -1,42 +1,62 @@
-import Map "mo:base/HashMap";
 import ProfileSchema "../schemas/profileSchema";
+import Map "mo:base/HashMap";
 import Text "mo:base/Text";
+import Principal "mo:base/Principal";
+import Types "../modules/types";
+import Auth "../modules/auth";
+import main "../main"
 
 // Actor que maneja los perfiles de usuario
-actor ProfileManager {
+module {
 
     // Estado: Mapa para almacenar perfiles usando el ID como clave
-    var profiles: Map.HashMap<Text, ProfileSchema.Profile> = Map.HashMap<Text, ProfileSchema.Profile>(1,Text.equal, Text.hash);
+    var profiles: Map.HashMap<Principal, ProfileSchema.Profile> = Map.HashMap<Principal, ProfileSchema.Profile>(2, Principal.equal, Principal.hash);
+     
+
 
     // Crear un nuevo perfil
-    public func createProfile(username: Text, bio: ?Text, email: Text, age: Nat, social: [ProfileSchema.SocialNetwork]): async ProfileSchema.Profile {
-        let newProfile = ProfileSchema.createProfile(username, bio, email, age, social);
-        profiles.put(username, newProfile);
+    public func createProfile(principal: Principal, username: Text, bio: ?Text,age: Nat, email: Text): async (ProfileSchema.Profile) {
+        let newProfile = ProfileSchema.createProfile(username, bio, age, ?email);
+        //profiles.put(principal, newProfile);
 
         return newProfile;
     };
 
     // Obtener un perfil por ID
-    public query func getProfile(username: Text): async ?ProfileSchema.Profile {
-        return profiles.get(username);
+    public shared query ({caller}) func getName(): async (Types.GetNameResult) {
+        if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
+       
+        let profile: ?ProfileSchema.Profile = profiles.get(caller);
+
+        switch(profile) {
+            case(null) {
+                return #err(#nameIsNull);
+            };
+            case(?profile) {
+                return #ok(profile.username);
+            };
+        }
     };
 
     // Actualizar un perfil por ID
-    public func updateProfile(username: Text, bio: ?Text, email: Text, age: Nat, social: [ProfileSchema.SocialNetwork]): async ?ProfileSchema.Profile {
-        switch (profiles.get(username)) {
+    public shared func updateProfile(principal: Principal, username: Text, bio: ?Text, age: Nat,email: Text ): async (Types.GetNameResult) {
+        
+        if (Auth.isAuth(principal)) return #err(#userNotAuthenticated);
+        
+        switch (profiles.get(principal)) {
 
             case (?profile) {
-                let updatedProfile = { profile with username = username; bio = bio; email = email; age = age; social = social };
-                profiles.put(username, updatedProfile);
-                return ?updatedProfile;
+                let updatedProfile = { profile with username = username; bio = bio; age = age; email = ?email};
+                profiles.put(principal, updatedProfile);
+                return #ok("ok");
             };
 
-            case null { return null; };
+            case null { return (#err(#nameIsNull)); };
         };
     };
 
     // Eliminar un perfil por ID
-    public func deleteProfile(username: Text): async ?ProfileSchema.Profile {
-        return profiles.remove(username);
+    public shared func deleteProfile(principal: Principal): async (?ProfileSchema.Profile) {
+        return profiles.remove(principal);
     };
-}
+};

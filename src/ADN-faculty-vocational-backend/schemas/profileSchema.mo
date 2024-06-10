@@ -3,22 +3,16 @@ module {
         username: Text;
         bio: ?Text;
         age: Nat;
-        social: [SocialNetwork];
-    };
-
-    public type SocialNetwork = {
-        name: Text;
-        url: Text;
+        email: ?Text;
     };
 
     // Función para crear un perfil
-    public func createProfile(username: Text, bio: ?Text, email: Text, age: Nat, social: [SocialNetwork]) : Profile {
+    public func createProfile(username: Text, bio: ?Text, age: Nat, email: ?Text) : Profile {
         return {
             username = username;
-            bio = bio;
-            email = email;
+            bio = bio;            
             age = age;
-            social = social;
+            email = email;            
         };
     }
 }

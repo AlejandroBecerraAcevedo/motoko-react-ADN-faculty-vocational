@@ -1,4 +1,3 @@
-
 import Principal "mo:base/Principal";
 import Map "mo:base/HashMap";
 import Types "modules/types";
@@ -8,6 +7,20 @@ import Schema "schemas/profileSchema";
 
 
 actor {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   stable var _name: ?Text = null;
 
 
@@ -19,7 +32,8 @@ actor {
     return caller;
   };
 
-  public query func getName(): async (Types.GetNameResult) {
+  public query ({caller}) func getName(): async (Types.GetNameResult) {
+    if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
     switch(_name) {
       case(null) {
         return #err(#nameIsNull);
@@ -30,7 +44,7 @@ actor {
     }
   };
 
-  public shared ({caller}) func setName(name: Text): async (Types.SetNameResult) {
+  public shared ({caller}) func setName(name: Text): async Types.SetNameResult {
     if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
 
     _name := ?name;
@@ -43,65 +57,57 @@ actor {
 
 
 
-  let rodrigo: Schema.Profile = {
-    username = "rodrigo";
-    bio = ?"Software Developer";
-    age = 21;
-    social = [{
-      name = "Facebook";
-      url = "https://www.facebook.com";
-    }];
-  };
+  // let rodrigo: Schema.Profile = {
+  //   username = "rodrigo";
+  //   bio = ?"Software Developer";
+  //   age = 21;
+  //   email = ?"https://www.facebook.com";    
+  // };
 
-  let maribel: Schema.Profile = {
-    username = "maribel";
-    bio = ?"Software Developer";
-    age = 20;
-    social = [{
-      name = "Facebook";
-      url = "https://www.facebook.com";
-    },{
-      name = "X";
-      url = "https://www.x.com";
-    }];
-  };
+  // let maribel: Schema.Profile = {
+  //   username = "maribel";
+  //   bio = ?"Software Developer";
+  //   age = 20;
+  //   email = ?"https://www.facebook.com";
+    
+  // };
 
-  let profiles = Map.HashMap<Text, Schema.Profile>(1, Text.equal, Text.hash);
+  // let prof = Map.HashMap<Text, Schema.Profile>(1, Text.equal, Text.hash);
 
   
-  profiles.put("rodrigo", rodrigo);
+  // prof.put("rodrigo", rodrigo);
 
-  let rodri: ?Schema.Profile = profiles.get("rodrigo");
+  // let rodri: ?Schema.Profile = prof.get("rodrigo");
 
-  public query func getProfileRodri(): async (Types.GetProfileResult) {
-    switch(rodri) {
+  // public query func getProfileRodri(): async (Types.GetProfileResult) {
+  //   switch(rodri) {
 
-      case(null) {
-        return #err(#profileAlreadyDontExist);
-      };
+  //     case(null) {
+  //       return #err(#profileAlreadyDontExist);
+  //     };
 
-      case(?rodri) {
-        return #ok("Already exist");
-      };
-    }
-  };
+  //     case(?rodri) {
+  //       return #ok("Already exist");
+  //     };
+  //   }
+  // };
 
-  // Validar si rodri existe
+  // // Validar si rodri existe
 
-  let mari = profiles.get("maribel");
+  // let mari = prof.get("maribel");
 
-  public query func getProfileMari(): async (Types.GetProfileResult) {
-    switch(mari) {
+  // public query func getProfileMari(): async (Types.GetProfileResult) {
+  //   switch(mari) {
 
-      case(null) {
-        return #err(#profileAlreadyDontExist);
-      };
+  //     case(null) {
+  //       return #err(#profileAlreadyDontExist);
+  //     };
 
-      case(?mari) {
-        return #ok("Already exist");
-      };
-    }
-  };
+  //     case(?mari) {
+  //       return #ok("Already exist");
+  //     };
+  //   }
+  // };
 
   // Validar si mari existe
 }
