@@ -7,6 +7,7 @@ import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Int "mo:base/Int";
+import Iter "mo:base/Iter";
 import Auth "modules/auth";
 import Survey "schemas/questionSchema";
 import ProfileProf "schemas/profileProfSchema";
@@ -16,7 +17,7 @@ import ProfileSchema "schemas/profileSchema";
 
 actor {
 
-  var profilesProf: Map.HashMap<Principal, ProfileProf.ProfileProf> = Map.HashMap<Principal, ProfileProf.ProfileProf>(0,Principal.equal, Principal.hash);
+  var profilesProf: Map.HashMap<Text, ProfileProf.ProfileProf> = Map.HashMap<Text, ProfileProf.ProfileProf>(0,Text.equal, Text.hash);
   var surveys: Map.HashMap<Text, Survey.Survey> = Map.HashMap<Text, Survey.Survey>(0, Text.equal, Text.hash);
   var profiles: Map.HashMap<Text, ProfileSchema.Profile> = Map.HashMap<Text, ProfileSchema.Profile>(0, Text.equal, Text.hash);
   
@@ -42,7 +43,7 @@ actor {
 
 
 
-  public shared query ({caller}) func getAllResponses(): async (Types.GetScoreResult) {
+  public shared ({caller}) func getAllResponses(): async (Types.GetProfileResult) {
     if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
     
 
@@ -91,15 +92,15 @@ actor {
 
     //Crear el perfil vocacional
 
-    let newProfile = ProfileProf.createProfileProf ("EMPRENDEDOR", percent.get(0));
-    let newProfile1 = ProfileProf.createProfileProf ("ARTISTA", percent.get(1));
-    let newProfile2 = ProfileProf.createProfileProf ("MATEMATICO", percent.get(2));
-    let newProfile3 = ProfileProf.createProfileProf ("INGENIERO", percent.get(3));
+    let newProfile = ProfileProf.createProfileProf ("EDUCACION", percent.get(0));
+    let newProfile1 = ProfileProf.createProfileProf ("ARTES", percent.get(1));
+    let newProfile2 = ProfileProf.createProfileProf ("EXACTAS", percent.get(2));
+    let newProfile3 = ProfileProf.createProfileProf ("INGENIERIA", percent.get(3));
 
-    profilesProf.put(caller, newProfile);
-    profilesProf.put(caller, newProfile1);
-    profilesProf.put(caller, newProfile2);
-    profilesProf.put(caller, newProfile3);
+    profilesProf.put("E", newProfile);
+    profilesProf.put("A", newProfile1);
+    profilesProf.put("M", newProfile2);
+    profilesProf.put("I", newProfile3);
 
     let globalScore = Buffer.toText(percent, Float.toText);
 
@@ -132,22 +133,35 @@ actor {
   };
 
 
-  // public shared query ({caller}) func crateProfilesProf(name : ?Text, score: Float) : async Types.SetProfileResult {
-  //   if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
+  public query ({caller}) func getAllScores(): async Types.GetScoreResult {
 
-  //   switch(name) {
-  //     case(null) {
-  //       return #err(#nameIsNull);
-  //     };
-  //     case(?myVar) {
-  //       let newProfile = ProfileProf.createProfileProf (name : ?Text, score: Float);
-  //       profilesProf.put(caller, newProfile);
+    if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
+    
 
-  //       return #ok(myVar);
-  //     };
-  //   };   
-  // };
+    switch(?profilesProf) {
+      case(null) {
+        return #err(#nameIsNull);
+      };
+      case(?myVar) {
+        // Obtén el iterador de valores del HashMap
+        let iterator = profilesProf.vals();
+        // Convierte el iterador a una lista
+        let profilesArray: [ProfileProf.ProfileProf] = Iter.toArray(iterator);
 
+        // Convertir cada ProfileProf a Text
+        let profilesText: [Text] = Array.map(profilesArray, func (profile: ProfileProf.ProfileProf) : Text {
+            return "Name: " # profile.name # ", Score: " # Float.toText(profile.puntaje);
+        });
+
+        // Unir todos los textos en una sola cadena
+        return #ok(profilesText);
+
+        //return #ok(profilesArray.toText());
+      };
+    }    
+  };
+
+ 
 
 
   stable var _name: ?Text = null;

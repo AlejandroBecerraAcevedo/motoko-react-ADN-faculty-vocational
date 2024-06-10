@@ -7,18 +7,20 @@ module {
     private type SetNameResultSuccess = Bool;
     private type GetProfileResultSuccess = Text;
     private type SetProfileResultSuccess = Text;
-    private type GetScoreResultSuccess = Text;
+    private type GetScoreResultSuccess = [Text];
 
 
     private type GetScoreResultError = {
         #userNotAuthenticated;
         #profileAlreadyDontExist;
+        #nameIsNull
         
     };
 
 
     private type GetProfileResultError = {
         #profileAlreadyDontExist;
+        #userNotAuthenticated
         
     };
 
