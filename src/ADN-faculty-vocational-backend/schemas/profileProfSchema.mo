@@ -12,6 +12,6 @@ module {
       name = name;
       puntaje = puntaje;
     };
-  }
+  };
 
 };

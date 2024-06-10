@@ -1,8 +1,7 @@
 import ProfileProf "../schemas/profileProfSchema";
-import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
 import Float "mo:base/Float";
-import Principal "mo:base/Principal";
+
 
 
 // Actor que gestiona los perfiles profesionales

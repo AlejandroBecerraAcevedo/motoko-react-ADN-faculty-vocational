@@ -14,5 +14,5 @@ module {
             age = age;
             email = email;            
         };
-    }
-}
+    };
+};
