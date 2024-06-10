@@ -42,8 +42,8 @@ actor {
 
 
 
-  public query func getAllResponses(): async ([Float]) {
-
+  public shared query ({caller}) func getAllResponses(): async (Types.GetScoreResult) {
+    if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
     
 
     var ConteoA: Nat = 0;
@@ -88,10 +88,23 @@ actor {
     let percent = Buffer.map<Nat, Float>(count, func (x) {
         Float.fromInt(x) / size * 100.0; // Convertir cada elemento a Float y calcular el porcentaje
     });
-    
+
+    //Crear el perfil vocacional
+
+    let newProfile = ProfileProf.createProfileProf ("EMPRENDEDOR", percent.get(0));
+    let newProfile1 = ProfileProf.createProfileProf ("ARTISTA", percent.get(1));
+    let newProfile2 = ProfileProf.createProfileProf ("MATEMATICO", percent.get(2));
+    let newProfile3 = ProfileProf.createProfileProf ("INGENIERO", percent.get(3));
+
+    profilesProf.put(caller, newProfile);
+    profilesProf.put(caller, newProfile1);
+    profilesProf.put(caller, newProfile2);
+    profilesProf.put(caller, newProfile3);
+
+    let globalScore = Buffer.toText(percent, Float.toText);
 
     // Convertir el buffer a un arreglo y devolverlo
-    return Buffer.toArray<Float>(percent);
+    return #ok(globalScore);
     //return responseBuffer;
   };
   
@@ -119,37 +132,41 @@ actor {
   };
 
 
-  public shared query ({caller}) func crateProfilesProf(name : Text, score: Float) : async (Text) {
+  // public shared query ({caller}) func crateProfilesProf(name : ?Text, score: Float) : async Types.SetProfileResult {
+  //   if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
 
-    let newProfile = ProfileProf.createProfileProf (name, score);
+  //   switch(name) {
+  //     case(null) {
+  //       return #err(#nameIsNull);
+  //     };
+  //     case(?myVar) {
+  //       let newProfile = ProfileProf.createProfileProf (name : ?Text, score: Float);
+  //       profilesProf.put(caller, newProfile);
 
-    profilesProf.put(caller, newProfile);
-     return "Hello, " # name # "!";
-  };
-
-  
-
-
-
-
-
-
-
-
-
-
-
+  //       return #ok(myVar);
+  //     };
+  //   };   
+  // };
 
 
 
   stable var _name: ?Text = null;
 
 
-  public query func greet(name : Text) : async Text {
-     return "Hello, " # name # "!";
+  public query ({caller}) func greet(name : ?Text) : async Types.GetNameResult {
+    if (Auth.isAuth(caller)) return #err(#userNotAuthenticated);
+
+    switch(name) {
+      case(null) {
+        return #err(#nameIsNull);
+      };
+      case(?myVar) {
+        return #ok(myVar);
+      };
+    }    
   };
  
-  public query ({caller}) func whoAmI(): async Principal {
+  public query ({caller}) func whoAmI(): async Principal {    
     return caller;
   };
 
@@ -173,63 +190,5 @@ actor {
     return #ok(true);
   };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-  // let rodrigo: Schema.Profile = {
-  //   username = "rodrigo";
-  //   bio = ?"Software Developer";
-  //   age = 21;
-  //   email = ?"https://www.facebook.com";    
-  // };
-
-  // let maribel: Schema.Profile = {
-  //   username = "maribel";
-  //   bio = ?"Software Developer";
-  //   age = 20;
-  //   email = ?"https://www.facebook.com";
-    
-  // };
-
-  // let prof = Map.HashMap<Text, Schema.Profile>(1, Text.equal, Text.hash);
-
-  
-  // prof.put("rodrigo", rodrigo);
-
-  // let rodri: ?Schema.Profile = prof.get("rodrigo");
-
-  // public query func getProfileRodri(): async (Types.GetProfileResult) {
-  //   switch(rodri) {
-
-  //     case(null) {
-  //       return #err(#profileAlreadyDontExist);
-  //     };
-
-  //     case(?rodri) {
-  //       return #ok("Already exist");
-  //     };
-  //   }
-  // };
-
-  // // Validar si rodri existe
-
-  // let mari = prof.get("maribel");
-
-  // public query func getProfileMari(): async (Types.GetProfileResult) {
-  //   switch(mari) {
-
-  //     case(null) {
-  //       return #err(#profileAlreadyDontExist);
-  //     };
-
-  //     case(?mari) {
-  //       return #ok("Already exist");
-  //     };
-  //   }
-  // };
-
-  // Validar si mari existe
 }
 
